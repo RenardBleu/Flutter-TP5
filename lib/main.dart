@@ -1,7 +1,8 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-//import 'show-page.dart';
+import 'moviePage.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,13 +17,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+//----- LISTE FILM PAGE -----
+
+
 class MovieListScreen extends StatefulWidget {
   @override
   _MovieListScreenState createState() => _MovieListScreenState();
 }
 
 class _MovieListScreenState extends State<MovieListScreen> {
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   List<Movie> _movies = [];
 
   @override
@@ -51,10 +56,11 @@ class _MovieListScreenState extends State<MovieListScreen> {
                     onTap: (){
                       Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (BuildContext context) => MovieShowScreen(id: _movies[index])));
+                      MaterialPageRoute(builder: (BuildContext context) => MovieShowScreen(id: _movies[index].imdbID, title: _movies[index].title)));
                     },
                     title: Text(_movies[index].title),
                     subtitle: Text(_movies[index].years),
+                    leading: Image.network(_movies[index].img),
                   );
                 },
               ),
@@ -64,6 +70,11 @@ class _MovieListScreenState extends State<MovieListScreen> {
       ),
     );
   }
+
+
+//----- FONCTION FILM PAGE LISTE -----
+
+
   Future<void> _searchMovies(String query) async {
     const apiKey = 'f77d6379';
     final apiUrl = 'http://www.omdbapi.com/?apikey=$apiKey&s=$query';
@@ -83,82 +94,23 @@ class _MovieListScreenState extends State<MovieListScreen> {
   }
 }
 
-class MovieShowScreen extends StatefulWidget {
+//----- OBJET FILM -----
 
-  const MovieShowScreen({super.key, required this.id});
-  final String id;
-
-  
-
-  @override
-  _MovieShowScreenState createState() => _MovieShowScreenState();
-}
-
-class _MovieShowScreenState extends State<MovieShowScreen> {
-
-List<Movie> _movies = [];
-
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(widget.movie.title ?? 'Details du film'),
-      ),
-      body: _isLoading
-      ? Center(child: CircularProgressIndicator())
-      : _movieDetails == null
-      ? Center(child: Text('Erreur de chargement'))
-      : Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Titre: ${_movieDetails!['Title']}',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold)
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Année: ${_movieDetails!['Year']}'),
-            ],
-          ),
-        ),
-    );
-  }
-
-  Future<void>_initState(String query) async {
-    const apiKey = 'f77d6379';
-    final apiUrl = 'http://www.omdbapi.com/?apikey=$apiKey&i=$query';
-
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> movies = data['Search'];
-
-      setState(() {
-        _movies = movies.map((movie) => Movie.fromJson(movie)).toList();
-      });
-    } else {
-      throw Exception('Failed to load movies');
-    }
-  }
-
-}
 
 class Movie{
   final String title;
   final String years;
-  final String id;
+  final String imdbID;
+  final String img;
 
-  Movie({required this.title , required this.years});
+  Movie({required this.title , required this.years, required this.imdbID, required this.img});
 
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
       title: json['Title'] ?? 'Pas de titre',
       years: json['Year'] ?? 'pas d\'année',
+      imdbID: json['imdbID'] ?? 'aucun id',
+      img: json['Poster'] ?? 'aucune image'
     );
   }
 }
