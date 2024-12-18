@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 
 class MovieShowScreen extends StatefulWidget {
 
-  MovieShowScreen({super.key, required this.id, required this.title});
+  const MovieShowScreen({super.key, required this.id, required this.title});
   final String id;
   final String title;
   
@@ -21,7 +21,42 @@ class MovieShowScreen extends StatefulWidget {
 
 class _MovieShowScreenState extends State<MovieShowScreen> {
 Map<String, dynamic>? _movieDetails;
+String _type = '';
 bool _isLoading = true;
+Widget _PosterImage() {
+    if (_movieDetails!['Poster'] == 'N/A'){
+      if (_movieDetails!['Type'] == 'movie'){
+        _type = 'pour ce film';
+      }else{
+        if(_movieDetails!['Type'] == 'series'){
+          _type = 'pour cette série';
+        }else{
+          _type = 'à afficher';
+        }
+      }
+      return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 50),
+                  child: const Icon(Icons.image, size: 80,),
+                ),
+                Text('Aucune affiche $_type'),
+                const SizedBox(height: 50)
+              ],
+            );
+    }else{
+      return Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: Image.network(_movieDetails!['Poster']),
+                ),
+              ],
+            );
+    }
+  }
 
 
 @override
@@ -29,7 +64,7 @@ Widget build(BuildContext context) {
   _showFilm(widget.id);
   return Scaffold(
     appBar: AppBar(
-      title: Text(widget.title ?? 'Details du film'),
+      title: Text(widget.title),
       ),
       body: _isLoading
       ? const Center(child: CircularProgressIndicator())
@@ -40,18 +75,40 @@ Widget build(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Titre: ${_movieDetails!['Title']}',
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _PosterImage(),
+              ],
+            ),
+            Text('Titre: ${_movieDetails!['Title']}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold)
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(right: 10, bottom: 10),
+                  child: Text('Année: ${_movieDetails!['Year']}'),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  'Année: ${_movieDetails!['Year']}'),
-            ],
-          ),
+                Container(
+                  margin: const EdgeInsets.only(right: 10, bottom: 10),
+                  child: Text('Type: ${_movieDetails!['Type']}')
+                )
+              ],
+            ),
+            const Text('Description:'),
+            Text(_movieDetails!['Plot']),
+            Container(
+              margin: const EdgeInsets.only(top: 10),
+              child: Text('Genre: ${_movieDetails!['Genre']}'),
+            )
+          ],
         ),
+      ),
     );
   }
 

@@ -28,13 +28,20 @@ class MovieListScreen extends StatefulWidget {
 
 class _MovieListScreenState extends State<MovieListScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Widget _leadingImage(int index) {
+    if (_movies[index].img == 'N/A'){
+      return const Icon(Icons.image);
+    }else{
+      return Image.network(_movies[index].img);
+    }
+  }
   List<Movie> _movies = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('OMDb Movie Search'),
+        title: const Text('OMDb Movie Search'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -42,12 +49,12 @@ class _MovieListScreenState extends State<MovieListScreen> {
           children: [
             TextField(
               controller: _searchController,
-              decoration: InputDecoration(labelText: 'Search Movies'),
+              decoration: const InputDecoration(labelText: 'Rchercher des films/séries'),
               onSubmitted: (value) {
                 _searchMovies(value);
               },
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: ListView.builder(
                 itemCount: _movies.length,
@@ -60,7 +67,7 @@ class _MovieListScreenState extends State<MovieListScreen> {
                     },
                     title: Text(_movies[index].title),
                     subtitle: Text(_movies[index].years),
-                    leading: Image.network(_movies[index].img),
+                    leading: _leadingImage(index),
                   );
                 },
               ),
