@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'moviePage.dart';
 
+
+
+// testez l'app avec la série "the owl house" ps: c ma série pref
+// de plus vous verrez plus facillement la gestion de si il n'y a pas d'affiche
+
+
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
